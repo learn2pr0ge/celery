@@ -8,7 +8,7 @@ from django.urls import reverse_lazy
 from django.views.generic import (
     ListView, DetailView, CreateView, UpdateView, DeleteView
 )
-
+from django.contrib.auth.mixins import PermissionRequiredMixin
 
 class NewsList(ListView):
     model = Post
@@ -43,7 +43,8 @@ class NewsSearch(ListView):
         context['filter_set'] = self.filter_set
         return context
 
-class PostCreateMixin(CreateView):
+class PostCreateMixin(PermissionRequiredMixin, CreateView):
+    permission_required = ('news_portal_dev.add_post',)
     form_class = PostForm
     model = Post
     template_name = 'news_edit.html'
@@ -66,7 +67,8 @@ class NewsCreate(PostCreateMixin):
 #    template_name = 'news_edit.html'
 
 
-class PostUpdateMixin(UpdateView):
+class PostUpdateMixin(PermissionRequiredMixin,UpdateView):
+    permission_required = ('news_portal_dev.change_post',)
     form_class = PostForm
     model = Post
     template_name = 'news_edit.html'
@@ -82,7 +84,8 @@ class NewsUpdate(PostUpdateMixin):
     pass
 
 
-class PostDeleteMixin(DeleteView):
+class PostDeleteMixin(PermissionRequiredMixin, DeleteView):
+    permission_required = ('news_portal_dev.delete_post',)
     model = Post
     template_name = 'news_delete.html'
     success_url = reverse_lazy('news_list')
