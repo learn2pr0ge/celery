@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
+
 # Create your models here.
 
 class Author(models.Model):
@@ -64,8 +65,8 @@ class Post(models.Model):
 
 
 class PostCategory(models.Model):
-    post_con = models.ForeignKey(Post, on_delete=models.CASCADE)
-    category_con = models.ForeignKey(Category, on_delete=models.CASCADE)
+    post  = models.ForeignKey(Post, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
 
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
@@ -85,3 +86,15 @@ class Comment(models.Model):
     def dislike(self):
         self._rating -= 1
         self.save()
+
+class Subscriber(models.Model):
+    user = models.ForeignKey(
+        to=User,
+        on_delete=models.CASCADE,
+        related_name='subscriber',
+    )
+    category = models.ForeignKey(
+        to='Category',
+        on_delete=models.CASCADE,
+        related_name='subscriber',
+    )

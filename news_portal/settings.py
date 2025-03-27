@@ -42,10 +42,12 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.flatpages',
     'news_portal_dev',
+    'django_apscheduler',
     # 0AUTH
 
     'allauth',
     'allauth.account',
+
 ]
 
 SITE_ID = 1
@@ -127,6 +129,7 @@ USE_I18N = True
 
 USE_TZ = False
 
+SITE_URL = '127.0.0.1:8000'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
@@ -144,8 +147,21 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
-ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_EMAIL_VERIFICATION = 'optional'
 LOGIN_REDIRECT_URL = '/news/'
 LOGOUT_REDIRECT_URL = '/'
 ACCOUNT_FORMS = {"signup": "accounts.forms.CustomSignupForm"}
+
+#Send email
+
+#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_PORT = 465
+EMAIL_HOST_USER = "decor4all9184@yandex.ru"
+EMAIL_HOST_PASSWORD = "--------"
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
+
+DEFAULT_FROM_EMAIL = "decor4all9184@yandex.ru"
 

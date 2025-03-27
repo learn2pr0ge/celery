@@ -1,7 +1,7 @@
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import ListView, DetailView
-from  .models import Post
+from  .models import Post, Subscriber, Category
 from .filters import PostFilter
 from .forms import PostForm
 from django.urls import reverse_lazy
@@ -9,6 +9,10 @@ from django.views.generic import (
     ListView, DetailView, CreateView, UpdateView, DeleteView
 )
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.decorators import login_required
+from django.db.models import Exists, OuterRef
+from django.shortcuts import render
+from django.views.decorators.csrf import csrf_protect
 
 class NewsList(ListView):
     model = Post
@@ -60,12 +64,6 @@ class NewsCreate(PostCreateMixin):
     pass
 
 
-#пример кода на будущее
-#class NewsCreate(CreateView):
-#    form_class = PostForm
-#    model = Post
-#    template_name = 'news_edit.html'
-
 
 class PostUpdateMixin(PermissionRequiredMixin,UpdateView):
     permission_required = ('news_portal_dev.change_post',)
@@ -101,4 +99,32 @@ class PostDeleteMixin(PermissionRequiredMixin, DeleteView):
 
 class NewsDelete(PostDeleteMixin):
     pass
+
+@login_required
+@csrf_protect
+def subscriptions(request):
+    if request.method == 'POST':
+        category_id = request.POST.get('category_id')
+        category = Category.objects.get(id=category_id)
+        action = request.POST.get('action')
+
+        if action == 'subscribe':
+            Subscriber.objects.create(user=request.user, category=category)
+        elif action == 'unsubscribe':
+            Subscriber.objects.filter(user=request.user, category=category).delete()
+
+    categories_with_subscriptions = Category.objects.annotate(
+        user_subscribed=Exists(
+            Subscriber.objects.filter(
+                user=request.user,
+                category=OuterRef('pk'),
+            )
+        )
+    ).order_by('category')
+
+    return render(
+        request,
+        'subscriptions.html',
+        {'categories': categories_with_subscriptions},
+    )
 

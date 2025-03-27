@@ -1,0 +1,5 @@
+{% for post in posts %}
+  <h2>{{ post.title }}</h2>
+  <p>{{ post.text}}</p>
+  <a href="{{ link }}/news/{{ post.id }}">Читать дальше</a>
+{% endfor %}
