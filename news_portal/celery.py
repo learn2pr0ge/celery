@@ -2,6 +2,8 @@ import os
 from celery import Celery
 from celery.schedules import crontab
 
+"""Celery.py"""
+
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'news_portal.settings')
 
 app = Celery('news_portal')
