@@ -10,13 +10,13 @@ from django_apscheduler import util
 from django_apscheduler.jobstores import DjangoJobStore
 from django_apscheduler.models import DjangoJobExecution
 from news_portal_dev.models import Post, Category, Subscriber
-
+from datetime import timezone
 
 logger = logging.getLogger(__name__)
 
 
 def my_job():
-    cur_time = datetime.datetime.now()
+    cur_time = timezone.now()
     last_week = cur_time - datetime.timedelta(days=7)
     posts = Post.objects.filter(timestamp__gte=last_week).order_by('timestamp')
 
@@ -56,7 +56,7 @@ def my_job():
 
 @util.close_old_connections
 def delete_old_job_executions(max_age=604_800):
-    DjangoJobExecution.objects.delete_old_job_executions(max_age)
+    DjangoJobExecution.objects.filter(run_time__lt=datetime.datetime.now() - datetime.timedelta(seconds=max_age)).delete()
 
 
 class Command(BaseCommand):

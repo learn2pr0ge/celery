@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
+from django.core.cache import cache
 
 # Create your models here.
 
@@ -62,7 +63,9 @@ class Post(models.Model):
     def __str__(self):
         return self.title + '\n' + self.content[:124] + '...'
 
-
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        cache.delete(f'post-{self.pk}')
 
 class PostCategory(models.Model):
     post  = models.ForeignKey(Post, on_delete=models.CASCADE)

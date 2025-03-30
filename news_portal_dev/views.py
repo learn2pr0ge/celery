@@ -13,6 +13,9 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Exists, OuterRef
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_protect
+from .tasks import send_new_post, send_post_1week
+from datetime import datetime
+from django.core.cache import cache
 
 class NewsList(ListView):
     model = Post
@@ -31,6 +34,14 @@ class NewsDetail(DetailView):
     model = Post
     template_name = 'news_detail.html'
     context_object_name = 'news_detail'
+    queryset = Post.objects.all()
+
+    def get_object(self, *args, **kwargs):
+        obj = cache.get(f'post-{self.kwargs["pk"]}', None)
+        if obj is None:
+            obj = super().get_object(queryset=self.queryset)
+            cache.set(f'post-{self.kwargs["pk"]}', obj)
+        return obj
 
 class NewsSearch(ListView):
     model = Post
@@ -58,6 +69,7 @@ class PostCreateMixin(PermissionRequiredMixin, CreateView):
             form.instance.post_type = 'news'
         elif 'articles/create' in self.request.path:
             form.instance.post_type = 'article'
+        send_new_post.apply_async(countdown=2)
         return super().form_valid(form)
 
 class NewsCreate(PostCreateMixin):

@@ -11,6 +11,9 @@
         {% load static %}
         <link href="{% static 'css/styles.css' %}" rel="stylesheet" />
     </head>
+    {% load cache %}
+        {% cache 300 header%}
+            {% block header %}
     <body id="page-top">
         <!-- Navigation-->
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
@@ -26,6 +29,8 @@
                 </div>
             </div>
         </nav>
+         {% endblock header %}
+    {% endcache %}
         <!-- Header-->
         <header class="bg-primary bg-gradient text-white">
             <div class="container px-4 text-center">
@@ -48,9 +53,14 @@
             </div>
         </section>
         <!-- Footer-->
+        {% load cache %}
+        {% cache 300 footer %}
+            {% block footer %}
         <footer class="py-5 bg-dark">
             <div class="container px-4"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
         </footer>
+         {% endblock footer %}
+            {% endcache %}
         <!-- Bootstrap core JS-->
 
     </body>
